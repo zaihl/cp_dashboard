@@ -5,40 +5,56 @@ import {
     CodeChefUserProfile,
     AtCoderUserProfile,
     Platform,
-    UnifiedProblem, // Should come from lib/types
-    ProblemPlatform, // Should come from lib/types
-    ProblemsApiResponse, // Can be defined here or in lib/types
-    GetProblemsParams, // Can be defined here or in lib/types
+    ProblemsApiResponse,
+    GetProblemsParams,
     ContestsApiResponse,
+    UnifiedProblem,
+    ProblemPlatform,
 } from "./types";
 
-const APP_BASE_URL = process.env.NEXT_BASE_URL || 'http://localhost:3000';
+// 1. Normalize NEXT_BASE_URL and define APP_BASE_URL correctly
+let baseUrl = process.env.NEXT_BASE_URL || 'http://localhost:3000';
+if (baseUrl.endsWith('/')) {
+    baseUrl = baseUrl.slice(0, -1); // Remove trailing slash if present
+}
+const APP_BASE_URL = baseUrl; // This is now like https://cp-dashboard-jade.vercel.app
 
 async function fetchUserData(
     platform: Platform,
     username: string
-): Promise<LeetCodeUserProfile | CodeforcesUserProfile | CodeChefUserProfile | AtCoderUserProfile | null> {
+): Promise<LeetCodeUserProfile | CodeforcesUserProfile | CodeChefUserProfile | AtCoderUserProfile> {
     if (!username.trim()) {
+        console.error("Username cannot be empty in fetchUserData.");
         throw new Error("Username cannot be empty.");
     }
+
+    // 2. Construct the correct API path including "/api"
+    const apiUrl = `${APP_BASE_URL}/api/${platform}/getUser?username=${encodeURIComponent(username.trim())}`;
+    console.log(`[api.ts] Fetching user data from: ${apiUrl}`);
+
     try {
-        const response = await fetch(
-            `${APP_BASE_URL}/api/${platform}/getUser?username=${encodeURIComponent(username)}`
-        );
+        const response = await fetch(apiUrl);
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            let errorResponseMessage = `Network response was not ok: ${response.statusText} (Status: ${response.status})`;
+            try {
+                const errorData = await response.json();
+                errorResponseMessage = errorData.error || errorData.message || errorResponseMessage;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (e) {
+                const rawErrorText = await response.text().catch(() => `Status: ${response.status}, could not read error response.`);
+                errorResponseMessage = `Network response error: ${rawErrorText.substring(0, 200)}`;
+                console.error(`[api.ts] Failed to parse error JSON for ${platform}/${username}. Status: ${response.status}. Raw error: ${rawErrorText}`);
+            }
             throw new Error(
-                `Failed to fetch data for ${username} from ${platform}: ${errorData.message || response.statusText} (Status: ${response.status})`
+                `Failed to fetch data for ${username} from ${platform}: ${errorResponseMessage}`
             );
         }
         const data = await response.json();
-
-        // Here you might want to add Zod parsing on the client-side as well for robustness,
-        // or trust the backend's Zod validation. For simplicity, I'm omitting client-side Zod here.
         return data;
     } catch (error) {
-        console.error(`Error fetching user data for ${platform}:`, error);
-        throw error; // Re-throw to be caught by the component
+        console.error(`[api.ts] Error in fetchUserData for ${platform}/${username}:`, error);
+        throw error;
     }
 }
 
