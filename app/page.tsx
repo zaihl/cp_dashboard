@@ -1,103 +1,97 @@
-import Image from "next/image";
+// app/page.tsx
+"use client"; // This component needs interactivity (state, event handlers)
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import type { Platform } from "@/lib/types"; // Assuming types.ts is in lib
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function HomePage() {
+    const [username, setUsername] = useState("");
+    const [platform, setPlatform] = useState<Platform>("leetcode");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (!username.trim()) {
+            setError("Username cannot be empty.");
+            return;
+        }
+        setError(null);
+        setIsLoading(true);
+        router.push(`/${platform}/${encodeURIComponent(username.trim())}`);
+        // setIsLoading(false) will happen on navigation or if an error occurs before navigation
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+            {" "}
+            {/* Adjust height based on header/footer */}
+            <div className="w-full max-w-md p-8 space-y-6 bg-slate-800 rounded-xl shadow-2xl">
+                <h1 className="text-3xl font-bold text-center text-sky-400">
+                    Search Coding Profile
+                </h1>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label
+                            htmlFor="username"
+                            className="block text-sm font-medium text-slate-300"
+                        >
+                            Username
+                        </label>
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            autoComplete="off"
+                            required
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="mt-1 block w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                            placeholder="Enter username"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="platform"
+                            className="block text-sm font-medium text-slate-300"
+                        >
+                            Platform
+                        </label>
+                        <select
+                            id="platform"
+                            name="platform"
+                            value={platform}
+                            onChange={(e) =>
+                                setPlatform(e.target.value as Platform)
+                            }
+                            className="mt-1 block w-full pl-3 pr-10 py-2.5 bg-slate-700 border border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                        >
+                            <option value="leetcode">LeetCode</option>
+                            <option value="codeforces">Codeforces</option>
+                            <option value="codechef">CodeChef</option>
+                        </select>
+                    </div>
+
+                    {error && (
+                        <p className="text-sm text-red-400 bg-red-900/30 p-2 rounded-md">
+                            {error}
+                        </p>
+                    )}
+
+                    <div>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? "Searching..." : "Search Profile"}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }

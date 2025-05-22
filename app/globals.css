@@ -23,4 +23,109 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  @apply bg-gradient-to-br from-slate-900 via-slate-950 to-black text-slate-200; /* More dynamic background */
+}
+
+@layer utilities { /* Optional: to allow Tailwind to override if needed, or just put it at the end */
+  .bloom-1, .bloom-2, .bloom-3 {
+    @apply absolute rounded-full opacity-30 mix-blend-soft-light; /* mix-blend can create nice effects, 'soft-light', 'screen', or 'overlay' */
+    filter: blur(100px); /* Adjust blur amount for desired softness */
+    will-change: transform, opacity; /* Performance hint for browsers */
+  }
+
+  .bloom-1 {
+    @apply bg-sky-500; /* Tailwind color */
+    width: 400px; /* Example size */
+    height: 400px;
+    animation: moveBloom1 25s infinite alternate ease-in-out;
+  }
+
+  .bloom-2 {
+    @apply bg-purple-600; /* Tailwind color */
+    width: 350px;
+    height: 350px;
+    animation: moveBloom2 30s infinite alternate ease-in-out;
+  }
+
+  .bloom-3 {
+    @apply bg-pink-500; /* Tailwind color */
+    width: 300px;
+    height: 300px;
+    animation: moveBloom3 20s infinite alternate ease-in-out;
+  }
+
+  @keyframes moveBloom1 {
+    0% {
+      transform: translate(10vw, 10vh) scale(1);
+      opacity: 0.2;
+    }
+    50% {
+      transform: translate(60vw, 70vh) scale(1.2);
+      opacity: 0.4;
+    }
+    100% {
+      transform: translate(20vw, 30vh) scale(1);
+      opacity: 0.25;
+    }
+  }
+
+  @keyframes moveBloom2 {
+    0% {
+      transform: translate(70vw, 20vh) scale(1);
+      opacity: 0.25;
+    }
+    50% {
+      transform: translate(20vw, 60vh) scale(0.8);
+      opacity: 0.35;
+    }
+    100% {
+      transform: translate(60vw, 10vh) scale(1.1);
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes moveBloom3 {
+    0% {
+      transform: translate(40vw, 80vh) scale(0.9);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translate(80vw, 30vh) scale(1.1);
+      opacity: 0.2;
+    }
+    100% {
+      transform: translate(10vw, 50vh) scale(1);
+      opacity: 0.35;
+    }
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1e293b; /* slate-800 */
+}
+::-webkit-scrollbar-thumb {
+  background: #3b82f6; /* blue-500 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb; /* blue-600 */
+}
+/* Example for a card component's base class */
+.modern-card {
+  @apply bg-slate-800/60 backdrop-blur-lg border border-slate-700/50 rounded-xl shadow-2xl p-6;
+  /* Adjust opacity (e.g., /60), blur amount, border opacity */
+}
+.modern-card-solid {
+  @apply bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl shadow-xl p-6;
+}
+.modern-card-light {
+   @apply bg-transparent border border-sky-500/30 rounded-xl shadow-lg p-6;
+}
+/* Example for an input field */
+.modern-input {
+  @apply bg-slate-700/50 backdrop-blur-sm border border-slate-600/70 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500;
 }
