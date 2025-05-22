@@ -135,12 +135,10 @@ export default function CodeChefDashboard({ data, username }: Props) {
                 </h2>
                 {ratingData && ratingData.length > 0 ? (
                     <div className="overflow-x-auto rounded-lg border border-slate-700/80 max-h-[500px]">
-                        {" "}
                         {/* Added max-h for scroll */}
                         <table className="min-w-full">
                             <thead className="bg-slate-700/80 backdrop-blur-sm sticky top-0">
-                                {" "}
-                                {/* Sticky header */}
+=                                {/* Sticky header */}
                                 <tr>
                                     <th
                                         scope="col"

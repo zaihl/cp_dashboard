@@ -1,6 +1,6 @@
 // app/[platform]/[username]/loading.tsx
-import Loader from "@/components/Loader";
+import GenericDashboardSkeleton from "@/components/skeletons/GenericDashboardSkeleton"; // Adjust path if needed
 
 export default function LoadingDashboard() {
-    return <Loader text="Fetching profile data..." />;
+    return <GenericDashboardSkeleton />;
 }

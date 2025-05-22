@@ -199,6 +199,56 @@ export const codeChefUserSchema = z.object({
     ratingData: z.array(codeChefRatingDataEntrySchema), // Uses codeChefRatingDataEntrySchema
 });
 
+// Schema for individual submission from AtCoder API (remains the same)
+export const atCoderApiSubmissionSchema = z.object({
+    id: z.number(),
+    epoch_second: z.number(),
+    problem_id: z.string(),
+    contest_id: z.string(),
+    user_id: z.string(),
+    language: z.string(),
+    point: z.number(),
+    length: z.number(),
+    result: z.string(), // e.g., "AC", "WA"
+    execution_time: z.number().nullable().optional(),
+});
+export type AtCoderApiSubmission = z.infer<typeof atCoderApiSubmissionSchema>;
+
+// Processed submission entry (remains the same)
+export const atCoderProcessedSubmissionSchema = z.object({
+    id: z.number(),
+    problemId: z.string(),
+    contestId: z.string(),
+    language: z.string(),
+    verdict: z.string(),
+    points: z.number(),
+    submittedAtSeconds: z.number(),
+});
+export type AtCoderProcessedSubmission = z.infer<typeof atCoderProcessedSubmissionSchema>;
+
+// Schema for user rank statistics (simplified example, API might just return a number or rank object)
+export const atCoderUserRankSchema = z.object({
+    count: z.number().optional(), // For AC count or rated point sum
+    rank: z.number().optional(),  // For global rank if available directly
+    // The language_rank API might return something like: [{ language: "C++", count: 100 }, ...]
+});
+export type AtCoderUserRank = z.infer<typeof atCoderUserRankSchema>;
+
+
+// Updated AtCoder User Profile Structure for our API
+export const atCoderUserProfileSchema = z.object({
+    handle: z.string(),
+    acceptedCount: z.number().optional(), // From ac_rank if we fetch the count
+    acceptedCountRank: z.number().optional(), // From ac_rank if we fetch the rank
+    ratedPointSum: z.number().optional(), // From rated_point_sum_rank
+    ratedPointSumRank: z.number().optional(), // From rated_point_sum_rank
+    // Streak info would also go here if fetched
+    // Language stats could be an array: languageStatistics: z.array(z.object({ language: z.string(), count: z.number() })).optional(),
+    recentSubmissions: z.array(atCoderProcessedSubmissionSchema),
+    // Removed currentRating, highestRating, contestHistory as we don't have a non-deprecated API for them directly
+});
+
+export type AtCoderUserProfile = z.infer<typeof atCoderUserProfileSchema>;
 export type CodeChefUser = z.infer<typeof codeChefUserSchema>;
 export type CodeforcesUserProfile = z.infer<typeof codeforcesUserProfileSchema>;
 export type LeetCodeUserData = z.infer<typeof leetCodeUserDataSchema>;

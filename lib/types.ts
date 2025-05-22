@@ -75,7 +75,7 @@ export interface CodeforcesUserInfo {
     contribution: number;
     friendOfCount: number;
     lastOnlineTimeSeconds: number;
-    registrationTimeSeconds: number; 
+    registrationTimeSeconds: number;
 }
 
 export interface CodeforcesRatingChange {
@@ -123,7 +123,95 @@ export interface CodeChefUserProfile {
     ratingData: CodeChefRatingDataEntry[];
 }
 
-// General API Response Type
-export type UserProfile = LeetCodeUserProfile | CodeforcesUserProfile | CodeChefUserProfile;
+export interface AtCoderSubmissionEntry { // This can remain largely the same
+    id: number;
+    problemId: string;
+    contestId: string;
+    language: string;
+    verdict: string;
+    points: number;
+    submittedAtSeconds: number;
+}
 
-export type Platform = "leetcode" | "codeforces" | "codechef";
+// Updated AtCoder User Profile for Frontend
+export interface AtCoderUserProfile {
+    handle: string;
+    acceptedCount?: number;
+    acceptedCountRank?: number; // May not be available
+    ratedPointSum?: number;
+    ratedPointSumRank?: number; // May not be available
+    // Add other stats if you fetch them (e.g., streak, language stats)
+    recentSubmissions: AtCoderSubmissionEntry[];
+}
+
+// Update Union type
+export type UserProfile = LeetCodeUserProfile | CodeforcesUserProfile | CodeChefUserProfile | AtCoderUserProfile;
+export type Platform = "leetcode" | "codeforces" | "codechef" | "atcoder";
+
+
+export type ProblemPlatform = 'LeetCode' | 'Codeforces' | 'AtCoder';
+
+export interface UnifiedProblem {
+    id: string;
+    title: string;
+    url: string;
+    platform: ProblemPlatform;
+    difficulty?: string | number;
+    tags?: string[];
+    problemIdOnPlatform: string;
+    contestId?: string;
+    paidOnly?: boolean;
+    solvedCount?: number;
+}
+
+export interface ProblemsApiResponse {
+    problems: UnifiedProblem[];
+    totalPages: number;
+    currentPage: number;
+    totalProblems: number;
+}
+
+export interface GetProblemsParams {
+    search?: string;
+    platform?: ProblemPlatform | '';
+    difficulty?: string;
+    tags?: string[];
+    page?: number;
+    limit?: number;
+}
+
+export interface UnifiedContest {
+    id: number; // CLIST.by uses a numeric ID
+    event: string; // Contest Title
+    href: string; // URL to the contest
+    resource: string; // Platform name (e.g., "leetcode.com", "codeforces.com")
+    host: string; // Cleaner platform name, often same as resource or derived
+    start: string; // ISO 8601 datetime string (e.g., "2025-06-15T14:00:00")
+    end: string; // ISO 8601 datetime string
+    duration: number; // Duration in seconds
+    // You might add derived fields like isUpcoming, isPast, platformLogo based on 'host'
+    isUpcoming?: boolean;
+    isPast?: boolean;
+    platformDisplayName?: string; // e.g., "LeetCode", "Codeforces"
+}
+
+export interface ContestsApiResponse {
+    totalPages: number;
+    contests: UnifiedContest[];
+    meta?: { // CLIST.by provides pagination meta
+        limit: number;
+        next: string | null;
+        offset: number;
+        previous: string | null;
+        total_count: number;
+    };
+}
+
+export interface GetContestsParams {
+    upcoming?: boolean;
+    past?: boolean;
+    limit?: number;
+    offset?: number; // For CLIST API call from backend
+    resources?: string;
+    page?: number; // For frontend state and query to our backend
+}
