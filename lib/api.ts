@@ -12,8 +12,8 @@ import {
     ProblemPlatform,
 } from "./types";
 
-// 1. Normalize NEXT_BASE_URL and define APP_BASE_URL correctly
-let baseUrl = process.env.NEXT_BASE_URL || 'http://localhost:3000';
+// 1. Normalize and define APP_BASE_URL correctly
+let baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL!;
 if (baseUrl.endsWith('/')) {
     baseUrl = baseUrl.slice(0, -1); // Remove trailing slash if present
 }
@@ -77,7 +77,7 @@ export const getAtCoderUser = (username: string) => {
 // --- New function to fetch aggregated problems ---
 export const getProblems = async (params: GetProblemsParams = {}): Promise<ProblemsApiResponse> => {
     const query = new URLSearchParams();
-
+    console.log(`base url in problems is: ${baseUrl}`);
     // Append parameters if they exist and are not empty
     if (params.search?.trim()) query.set('search', params.search.trim());
     if (params.platform) query.set('platform', params.platform); // Empty string for 'platform' means "all" on backend
